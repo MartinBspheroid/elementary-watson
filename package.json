@@ -62,6 +62,11 @@
           "minimum": 100,
           "maximum": 2000,
           "description": "Delay in milliseconds before updating translation labels after typing stops (100-2000ms)."
+        },
+        "elementaryWatson.activeProject": {
+          "type": ["string", "null"],
+          "default": null,
+          "description": "The active project path relative to workspace root. Automatically set when selecting a project."
         }
       }
     },
@@ -98,6 +103,12 @@
         "command": "elementaryWatson.openTranslationFile",
         "title": "Open Translation File",
         "icon": "$(target)"
+      },
+      {
+        "command": "elementaryWatson.selectProject",
+        "title": "Select Active Project",
+        "category": "ElementaryWatson",
+        "icon": "$(folder-active)"
       }
     ]
   },
