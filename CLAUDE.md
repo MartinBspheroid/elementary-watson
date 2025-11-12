@@ -7,8 +7,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 **Poirot** is a VS Code extension that displays inline translation values for Paraglide JS i18n method calls in Svelte/SvelteKit applications. It previously named ElementaryWatson (v0.6.0+) and provides an alternative to the Sherlock extension with focused functionality for displaying and extracting translation strings.
 
 - **Type**: VS Code Extension
-- **Language**: JavaScript (Node.js CommonJS)
-- **Main Entry**: `extension.js`
+- **Language**: TypeScript (compiled to JavaScript, Node.js CommonJS)
+- **Main Entry**: `./out/extension.js` (compiled from `src/extension.ts`)
 - **Version**: 0.5.2
 
 ## Architecture Overview
@@ -58,6 +58,16 @@ concepts/
 npm test
 ```
 
+### Compile TypeScript
+```bash
+npm run compile
+```
+
+### Watch Mode (for development)
+```bash
+npm run watch
+```
+
 ### Run Linting
 ```bash
 npm run lint
@@ -70,8 +80,9 @@ npm run pretest
 
 ### Build/Package for Distribution
 ```bash
-# For VSCode extensions, no build step is needed (this is a pure JS extension)
-# To package for release, use:
+# Compile TypeScript first
+npm run compile
+# Then package for release:
 npm install -g vsce
 vsce package
 ```
@@ -80,6 +91,7 @@ vsce package
 1. Press F5 in VS Code to launch the extension in a debug window
 2. Open the VS Code Developer Tools (`Help → Toggle Developer Tools`)
 3. Check the console for logs (prefixed with emojis like 🔍, 💾, ✏️)
+4. Source maps are available for debugging TypeScript code (see `.map` files in `out/`)
 
 ### Key npm Scripts
 - `npm lint`: Run ESLint
@@ -127,30 +139,37 @@ Both patterns are parsed by `TranslationService.findTranslationCalls()` using re
 
 ## Key Files & Their Responsibilities
 
+All source files are written in **TypeScript** (`.ts`) and compiled to JavaScript (`.js`) in the `out/` directory.
+
 ### Core Extension Files
-- **`extension.js`** (23 lines): Entry point; creates and calls `ExtensionActivator`
-- **`concepts/extension/activator.js`** (629 lines): Orchestrates all services, manages lifecycle, event listeners, and debouncing
+- **`src/extension.ts`** (23 lines): Entry point; creates and calls `ExtensionActivator`
+- **`src/concepts/extension/activator.ts`** (629 lines): Orchestrates all services, manages lifecycle, event listeners, and debouncing
 
 ### Editor & Decoration
-- **`concepts/editor/service.js`**: Processes documents, finds translation calls, loads translations, applies decorations
-- **`concepts/editor/decorator.js`**: Creates and manages inline decorations (colored underlines, warning indicators)
-- **`concepts/editor/codelens.js`**: Provides CodeLens actions for navigating to translation files
+- **`src/concepts/editor/service.ts`**: Processes documents, finds translation calls, loads translations, applies decorations
+- **`src/concepts/editor/decorator.ts`**: Creates and manages inline decorations (colored underlines, warning indicators)
+- **`src/concepts/editor/codelens.ts`**: Provides CodeLens actions for navigating to translation files
 
 ### Translation Resolution
-- **`concepts/translation/service.js`** (261 lines): Finds translation calls, resolves values, handles nested keys, searches across locales
-- **`concepts/translation/repository.js`**: Loads translation JSON files from disk
+- **`src/concepts/translation/service.ts`** (261 lines): Finds translation calls, resolves values, handles nested keys, searches across locales
+- **`src/concepts/translation/repository.ts`**: Loads translation JSON files from disk
 
 ### Configuration & Locale
-- **`concepts/locale/service.js`**: Manages current locale, loads inlang settings, resolves translation file paths
-- **`concepts/project/service.js`** (198 lines): Scans for and manages `project.inlang` projects in monorepos
+- **`src/concepts/locale/service.ts`**: Manages current locale, loads inlang settings, resolves translation file paths
+- **`src/concepts/project/service.ts`** (198 lines): Scans for and manages `project.inlang` projects in monorepos
 
 ### UI & Sidebar
-- **`concepts/sidebar/service.js`**: Opens translation files, determines available locales
-- **`concepts/sidebar/project-provider.js`**: TreeDataProvider for project selector view
-- **`concepts/sidebar/translation-keys-provider.js`**: TreeDataProvider for translation keys view
+- **`src/concepts/sidebar/service.ts`**: Opens translation files, determines available locales
+- **`src/concepts/sidebar/project-provider.ts`**: TreeDataProvider for project selector view
+- **`src/concepts/sidebar/translation-keys-provider.ts`**: TreeDataProvider for translation keys view
 
 ### Text Extraction
-- **`concepts/extraction/service.js`**: Extracts selected text to translation files with user-friendly key generation
+- **`src/concepts/extraction/service.ts`**: Extracts selected text to translation files with user-friendly key generation
+
+### Configuration
+- **`tsconfig.json`**: TypeScript compiler configuration with strict type checking enabled
+- **`eslint.config.mjs`**: ESLint configuration for linting TypeScript files
+- **`.vscode/tasks.json`**: VS Code tasks (compile, watch) for development
 
 ## Important Implementation Details
 
@@ -206,11 +225,65 @@ All commands are registered in `ExtensionActivator`:
 
 ## Testing
 
-- **Test file**: `test/extension.test.js`
+- **Test file**: `test/extension.test.ts`
 - **Framework**: Mocha (via `@vscode/test-cli` and `@vscode/test-electron`)
-- **Run tests**: `npm test`
+- **Run tests**: `npm test` (also compiles TypeScript and runs linting via pretest)
 
 The extension is built primarily with integration tests in mind (testing with actual VS Code windows).
+
+## TypeScript Setup & Development
+
+### Configuration
+
+The project uses **TypeScript 5.9.3** with strict type checking enabled:
+
+- **`tsconfig.json`**: Strict compilation settings (`strict: true`)
+  - `module: "commonjs"` - Node.js CommonJS module system
+  - `target: "ES2022"` - Modern JavaScript target
+  - `outDir: "out"` - Compiled files output directory
+  - `sourceMap: true` - Source maps for debugging
+  - `declaration: true` - Generate `.d.ts` files
+
+### ESLint & Linting
+
+TypeScript files are linted using ESLint with the `typescript-eslint` configuration:
+
+- **ESLint Configuration**: `eslint.config.mjs` (modern flat config format)
+- **Parser**: `@typescript-eslint/parser` with `project: "./tsconfig.json"`
+- **Plugins**: `@typescript-eslint/eslint-plugin` rules
+- **Command**: `npm run lint` (lints `src/**/*.ts` files)
+
+### Development Workflow
+
+1. **Start watch mode**: `npm run watch`
+   - TypeScript compiler watches for changes and recompiles automatically
+
+2. **Run lint**: `npm run lint`
+   - Checks TypeScript files for linting errors
+
+3. **Test in VS Code**: Press **F5** in VS Code
+   - Launches extension in debug window with pre-configured build task
+   - Source maps enable debugging of TypeScript code
+
+4. **Build for release**: `npm run compile` then `vsce package`
+   - Compiles TypeScript to JavaScript
+   - Packages extension for VS Code Marketplace
+
+### Type Safety
+
+All TypeScript files enforce strict type checking:
+
+- No implicit `any` types
+- Full type annotations on function parameters and return values
+- Proper typing of VS Code API usage
+- Integration with `@types/vscode` and `@types/node`
+
+The codebase follows these key type patterns:
+
+- **Services**: Classes with typed methods and no public state mutation
+- **Configuration**: Typed interfaces for inlang settings, configuration objects
+- **Events**: EventEmitter with typed event handlers
+- **File I/O**: Record<string, unknown> for JSON data with proper type guards
 
 ## Common Gotchas & Edge Cases
 
