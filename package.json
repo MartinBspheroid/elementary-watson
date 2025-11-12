@@ -2,7 +2,7 @@
   "name": "poirot",
   "displayName": "Poirot",
   "icon": "icon.png",
-  "publisher": "romerramos",
+  "publisher": "MartinBlasko",
   "keywords": [
     "i18n",
     "translation",
@@ -19,13 +19,13 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/romerramos/poirot.git"
+    "url": "https://github.com/MartinBspheroid/poirot.git"
   },
   "author": {
     "name": "Romer"
   },
   "description": "VS Code extension that displays inline translation values for Paraglide JS i18n method calls in Svelte/SvelteKit applications",
-  "version": "0.5.1",
+  "version": "0.5.2",
   "engines": {
     "vscode": "^1.99.3"
   },

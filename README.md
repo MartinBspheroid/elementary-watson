@@ -1,6 +1,11 @@
 # Poirot - i18n Translation Companion
 
-> **Note**: This project was previously named "ElementaryWatson". It has been renamed to "Poirot" as of version 0.6.0. All functionality remains the same - only the name and internal identifiers have changed.
+> **Based on**: [ElementaryWatson](https://github.com/romerramos/elementary-watson) by [Romer](https://github.com/romerramos)
+
+> **Note**: This project was previously named "ElementaryWatson". It has been renamed to "Poirot" as of version 0.6.0, with additional improvements:
+> - **UX Enhancements**: Improved user interface and interaction patterns
+> - **Monorepo Support**: Now supports multiple inlang projects within monorepos
+> - All core functionality remains the same - the extension continues to work with the same i18n patterns
 
 A VS Code extension that displays inline translation values for i18n method calls in JavaScript, TypeScript, and Svelte applications. Supports inlang project structure and Paraglide JS, making it easier to see what text will be displayed without leaving your editor.
 
