@@ -39,7 +39,7 @@
     "onLanguage:typescriptreact",
     "onLanguage:svelte"
   ],
-  "main": "./extension.js",
+  "main": "./out/extension.js",
   "contributes": {
     "configuration": {
       "title": "Poirot",
@@ -64,7 +64,10 @@
           "description": "Delay in milliseconds before updating translation labels after typing stops (100-2000ms)."
         },
         "poirot.activeProject": {
-          "type": ["string", "null"],
+          "type": [
+            "string",
+            "null"
+          ],
           "default": null,
           "description": "The active project path relative to workspace root. Automatically set when selecting a project."
         }
@@ -118,8 +121,23 @@
     ]
   },
   "scripts": {
-    "lint": "eslint .",
-    "pretest": "npm run lint",
+    "vscode:prepublish": "npm run compile",
+    "compile": "tsc -p ./",
+    "watch": "tsc -watch -p ./",
+    "lint": "oxlint src/",
+    "lint:fix": "oxlint --fix src/",
+    "format": "oxfmt",
+    "format:check": "oxfmt --check",
+    "typecheck": "tsc --noEmit",
+    "build": "tsc -p ./",
+    "check:all": "npm run lint && npm run format:check && npm run typecheck",
+    "fix:all": "npm run lint:fix && npm run format",
+    "bump": "bumpp --execute 'npm run build'",
+    "bump:patch": "bumpp patch --execute 'npm run build'",
+    "bump:minor": "bumpp minor --execute 'npm run build'",
+    "bump:major": "bumpp major --execute 'npm run build'",
+    "release": "npm run check:all && npm run build && npm run bump",
+    "pretest": "npm run compile && npm run lint",
     "test": "vscode-test"
   },
   "devDependencies": {
@@ -128,7 +146,10 @@
     "@types/vscode": "^1.99.3",
     "@vscode/test-cli": "^0.0.11",
     "@vscode/test-electron": "^2.5.2",
-    "eslint": "^9.25.1"
+    "bumpp": "^10.3.1",
+    "oxfmt": "^0.13.0",
+    "oxlint": "^1.28.0",
+    "typescript": "^5.9.3"
   },
   "dependencies": {
     "human-id": "^4.1.1"
