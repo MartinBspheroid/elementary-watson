@@ -75,7 +75,7 @@ class ProjectService {
      * @returns {string} The active project path
      */
     getActiveProjectPath(workspacePath) {
-        const config = vscode.workspace.getConfiguration('elementaryWatson');
+        const config = vscode.workspace.getConfiguration('poirot');
         const savedProject = config.get('activeProject');
         
         if (savedProject) {
@@ -99,7 +99,7 @@ class ProjectService {
     async setActiveProject(workspacePath, projectPath) {
         try {
             const relativePath = path.relative(workspacePath, projectPath);
-            const config = vscode.workspace.getConfiguration('elementaryWatson');
+            const config = vscode.workspace.getConfiguration('poirot');
             
             await config.update('activeProject', relativePath, vscode.ConfigurationTarget.Workspace);
             

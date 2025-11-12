@@ -37,7 +37,7 @@ class ExtensionActivator {
      * @returns {number} Debounce delay in milliseconds
      */
     getDebounceDelay() {
-        const config = vscode.workspace.getConfiguration('elementaryWatson');
+        const config = vscode.workspace.getConfiguration('poirot');
         return config.get('updateDelay', 300);
     }
 
@@ -46,7 +46,7 @@ class ExtensionActivator {
      * @returns {boolean} True if real-time updates are enabled
      */
     isRealtimeUpdatesEnabled() {
-        const config = vscode.workspace.getConfiguration('elementaryWatson');
+        const config = vscode.workspace.getConfiguration('poirot');
         return config.get('realtimeUpdates', true);
     }
 
@@ -108,7 +108,7 @@ class ExtensionActivator {
      * @param {vscode.ExtensionContext} context The VS Code extension context
      */
     activate(context) {
-        console.log('ElementaryWatson i18n companion is now active!');
+        console.log('Poirot i18n companion is now active!');
 
         // Register the sidebar views
         this.registerSidebar();
@@ -158,13 +158,13 @@ class ExtensionActivator {
      */
     registerSidebar() {
         // Register project selector view
-        this.projectSelectorView = vscode.window.createTreeView('elementaryWatsonProjectSelector', {
+        this.projectSelectorView = vscode.window.createTreeView('poirotProjectSelector', {
             treeDataProvider: this.projectSelectorProvider,
             showCollapseAll: false
         });
 
         // Register translation keys view
-        this.translationKeysView = vscode.window.createTreeView('elementaryWatsonTranslationKeys', {
+        this.translationKeysView = vscode.window.createTreeView('poirotTranslationKeys', {
             treeDataProvider: this.translationKeysProvider,
             showCollapseAll: false
         });
@@ -176,8 +176,8 @@ class ExtensionActivator {
         this.translationKeysProvider.setTreeView(this.translationKeysView);
 
         // Set contexts to control visibility
-        vscode.commands.executeCommand('setContext', 'elementaryWatson.showProjectSelector', true);
-        vscode.commands.executeCommand('setContext', 'elementaryWatson.showSidebar', true);
+        vscode.commands.executeCommand('setContext', 'poirot.showProjectSelector', true);
+        vscode.commands.executeCommand('setContext', 'poirot.showSidebar', true);
     }
 
     /**
@@ -185,7 +185,7 @@ class ExtensionActivator {
      */
     registerSidebarCommands() {
         // Register open translation file command
-        const openTranslationCommand = vscode.commands.registerCommand('elementaryWatson.openTranslationFile', 
+        const openTranslationCommand = vscode.commands.registerCommand('poirot.openTranslationFile', 
             async (workspacePath, locale, key) => {
                 await this.sidebarService.openTranslationFile(workspacePath, locale, key);
             }
@@ -198,7 +198,7 @@ class ExtensionActivator {
      * Register the change locale command
      */
     registerChangeLocaleCommand() {
-        const changeLocaleCommand = vscode.commands.registerCommand('elementaryWatson.changeLocale', async () => {
+        const changeLocaleCommand = vscode.commands.registerCommand('poirot.changeLocale', async () => {
             const currentLocale = this.localeService.getCurrentLocale();
             const newLocale = await vscode.window.showInputBox({
                 prompt: 'Enter the locale code (e.g., en, es, fr)',
@@ -222,7 +222,7 @@ class ExtensionActivator {
      * Register the extract text command
      */
     registerExtractTextCommand() {
-        const extractTextCommand = vscode.commands.registerCommand('elementaryWatson.extractText', async () => {
+        const extractTextCommand = vscode.commands.registerCommand('poirot.extractText', async () => {
             const editor = vscode.window.activeTextEditor;
             if (!editor) {
                 vscode.window.showErrorMessage('No active text editor');
@@ -247,7 +247,7 @@ class ExtensionActivator {
      * Register the project selection command
      */
     registerProjectSelectionCommand() {
-        const selectProjectCommand = vscode.commands.registerCommand('elementaryWatson.selectProject', async (projectRelativePath) => {
+        const selectProjectCommand = vscode.commands.registerCommand('poirot.selectProject', async (projectRelativePath) => {
             try {
                 if (!vscode.workspace.workspaceFolders || vscode.workspace.workspaceFolders.length === 0) {
                     vscode.window.showErrorMessage('No workspace folder found');
@@ -299,11 +299,11 @@ class ExtensionActivator {
      * Register the translation label click command
      */
     registerTranslationLabelClickCommand() {
-        const clickLabelCommand = vscode.commands.registerCommand('elementaryWatson.clickTranslationLabel', 
+        const clickLabelCommand = vscode.commands.registerCommand('poirot.clickTranslationLabel', 
             async (translationKey, filePath) => {
                 try {
                     // Show the sidebar
-                    await vscode.commands.executeCommand('workbench.view.extension.elementaryWatson');
+                    await vscode.commands.executeCommand('workbench.view.extension.poirot');
                     
                     // Get the workspace folder to find the current locale
                     const workspaceFolder = vscode.workspace.getWorkspaceFolder(vscode.Uri.file(filePath));
@@ -552,7 +552,7 @@ class ExtensionActivator {
 
         // Listen for configuration changes
         const configChangeDisposable = vscode.workspace.onDidChangeConfiguration(async (event) => {
-            if (event.affectsConfiguration('elementaryWatson.defaultLocale')) {
+            if (event.affectsConfiguration('poirot.defaultLocale')) {
                 // Refresh current document when locale changes
                 await this.processActiveEditor();
                 
@@ -563,7 +563,7 @@ class ExtensionActivator {
                 }
             }
             
-            if (event.affectsConfiguration('elementaryWatson.realtimeUpdates')) {
+            if (event.affectsConfiguration('poirot.realtimeUpdates')) {
                 const enabled = this.isRealtimeUpdatesEnabled();
                 console.log(`🔄 Real-time updates ${enabled ? 'enabled' : 'disabled'}`);
                 
@@ -576,7 +576,7 @@ class ExtensionActivator {
                 }
             }
             
-            if (event.affectsConfiguration('elementaryWatson.updateDelay')) {
+            if (event.affectsConfiguration('poirot.updateDelay')) {
                 const delay = this.getDebounceDelay();
                 console.log(`⏱️  Update delay changed to ${delay}ms`);
             }

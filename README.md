@@ -1,4 +1,6 @@
-# ElementaryWatson - i18n Translation Companion
+# Poirot - i18n Translation Companion
+
+> **Note**: This project was previously named "ElementaryWatson". It has been renamed to "Poirot" as of version 0.6.0. All functionality remains the same - only the name and internal identifiers have changed.
 
 A VS Code extension that displays inline translation values for i18n method calls in JavaScript, TypeScript, and Svelte applications. Supports inlang project structure and Paraglide JS, making it easier to see what text will be displayed without leaving your editor.
 
@@ -12,17 +14,17 @@ A VS Code extension that displays inline translation values for i18n method call
 
 ## Motivation & Disclaimer
 
-I created this extension for my own development workflow because I was experiencing issues with the Sherlock VS Code extension from project.inlang - it was occasionally modifying my message files and deleting keys randomly. I needed a reliable way to use Paraglide JS in VS Code without worrying about unintended file modifications.
+I (Romer) created this extension for my own development workflow because I was experiencing issues with the Sherlock VS Code extension from project.inlang - it was occasionally modifying my message files and deleting keys randomly. I needed a reliable way to use Paraglide JS in VS Code without worrying about unintended file modifications.
 
 **Important**: This is not a criticism of project.inlang or their excellent work. On the contrary, I'm deeply grateful to them for creating Paraglide JS, which has been instrumental in making i18n development so much better in my applications. Big thanks to the project.inlang team! 🙏
 
-I built ElementaryWatson as an alternative that focuses purely on displaying and extracting translation values with minimal modification of your message files. If anyone else finds this approach useful, I'm happy to help.
+I built Poirot as an alternative that focuses purely on displaying and extracting translation values with minimal modification of your message files. If anyone else finds this approach useful, I'm happy to help.
 
 **Note**: This is a quick side project I built for my own needs. Use it at your own risk! (Though realistically, there's minimal risk since it's just a local extension that displays and extracts strings - no major modifications to your codebase. 😄)
 
 ## Project Structure Support
 
-ElementaryWatson supports two project structures:
+Poirot supports two project structures:
 
 ### 1. inlang Projects (Recommended)
 
@@ -67,27 +69,27 @@ Configure the default locale in your VS Code settings:
 
 ```json
 {
-  "elementaryWatson.defaultLocale": "es",
-  "elementaryWatson.realtimeUpdates": true,
-  "elementaryWatson.updateDelay": 300
+  "poirot.defaultLocale": "es",
+  "poirot.realtimeUpdates": true,
+  "poirot.updateDelay": 300
 }
 ```
 
 **Available Settings:**
-- `elementaryWatson.defaultLocale`: Default locale for displaying translation labels
-- `elementaryWatson.realtimeUpdates`: Enable/disable real-time updates while typing (default: true)
-- `elementaryWatson.updateDelay`: Delay in milliseconds before updating labels after typing stops (100-2000ms, default: 300ms)
+- `poirot.defaultLocale`: Default locale for displaying translation labels
+- `poirot.realtimeUpdates`: Enable/disable real-time updates while typing (default: true)
+- `poirot.updateDelay`: Delay in milliseconds before updating labels after typing stops (100-2000ms, default: 300ms)
 
 ### Locale Priority Order
 
 The extension determines which locale to display using this priority:
-1. VS Code workspace setting (`elementaryWatson.defaultLocale`)
+1. VS Code workspace setting (`poirot.defaultLocale`)
 2. `baseLocale` from `project.inlang/settings.json`
 3. Default fallback: "en"
 
 ## How It Works
 
-ElementaryWatson automatically displays translation values inline with your code. Here's when updates occur:
+Poirot automatically displays translation values inline with your code. Here's when updates occur:
 
 **Real-time Updates (Default):**
 - As you type: Labels update automatically after a brief pause (configurable delay)
@@ -153,7 +155,7 @@ export function load() {
 The extension works automatically with minimal setup:
 
 1. **For inlang projects**: Ensure you have `project.inlang/settings.json` configured
-2. **For simple projects**: Create a `messages/` directory with `{locale}.json` files  
+2. **For simple projects**: Create a `messages/` directory with `{locale}.json` files
 3. **Translation files**: Use JSON format with key-value pairs
 4. **Code**: Use `m.methodName()` pattern in your JavaScript/TypeScript/Svelte files
 
@@ -187,7 +189,7 @@ Example translation file (`messages/en.json`):
 If translations don't appear:
 
 1. **Check locale**: Verify the current locale has a corresponding translation file
-2. **Check file structure**: 
+2. **Check file structure**:
    - For inlang projects: Verify `project.inlang/settings.json` and `pathPattern` are correct
    - For simple projects: Ensure `messages/{locale}.json` files exist
 3. **Check translation files**: Ensure JSON files are valid and contain the expected keys
@@ -205,8 +207,8 @@ If translations don't appear:
 
 If you experience performance issues with real-time updates:
 
-1. **Increase update delay**: Set `elementaryWatson.updateDelay` to a higher value (e.g., 500-1000ms)
-2. **Disable real-time updates**: Set `elementaryWatson.realtimeUpdates` to `false` - labels will still update on save
+1. **Increase update delay**: Set `poirot.updateDelay` to a higher value (e.g., 500-1000ms)
+2. **Disable real-time updates**: Set `poirot.realtimeUpdates` to `false` - labels will still update on save
 3. **Check file size**: Real-time updates work best with files under 1000 lines
 4. **Monitor console**: Check VS Code Developer Console for performance warnings
 
@@ -214,6 +216,10 @@ If you experience performance issues with real-time updates:
 
 This extension is designed for i18n workflows using the `m.methodName()` pattern, with support for inlang projects and simple message directory structures. For issues or feature requests, please ensure they align with these use cases.
 
+## Author
+
+Created by **Romer** ([romerramos](https://github.com/romerramos))
+
 ---
 
-**Enjoy cleaner i18n development with ElementaryWatson!**
+**Enjoy cleaner i18n development with Poirot!**

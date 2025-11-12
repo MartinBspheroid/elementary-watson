@@ -118,7 +118,7 @@ class ProjectOptionNode extends vscode.TreeItem {
 
         if (!isActive) {
             this.command = {
-                command: 'elementaryWatson.selectProject',
+                command: 'poirot.selectProject',
                 title: 'Select Project',
                 arguments: [relativePath]
             };

@@ -232,7 +232,7 @@ class TranslationItemNode extends vscode.TreeItem {
 
         // Add command for clicking behavior with clearer indication
         this.command = {
-            command: 'elementaryWatson.openTranslationFile',
+            command: 'poirot.openTranslationFile',
             title: 'Navigate to translation',
             arguments: [this.workspacePath, this.locale, this.key]
         };

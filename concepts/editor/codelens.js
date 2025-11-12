@@ -41,7 +41,7 @@ class TranslationCodeLensProvider {
             
             const codeLens = new vscode.CodeLens(range, {
                 title: `$(globe)  Inspect Translation`,
-                command: 'elementaryWatson.clickTranslationLabel',
+                command: 'poirot.clickTranslationLabel',
                 arguments: [result.methodName, document.uri.fsPath]
             });
             

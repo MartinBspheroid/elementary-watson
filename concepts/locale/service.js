@@ -16,7 +16,7 @@ class LocaleService {
      */
     getCurrentLocale() {
         // 1. Check VS Code configuration
-        const config = vscode.workspace.getConfiguration('elementaryWatson');
+        const config = vscode.workspace.getConfiguration('poirot');
         const configLocale = config.get('defaultLocale');
         if (configLocale) {
             return configLocale;
@@ -115,7 +115,7 @@ class LocaleService {
      * @returns {Promise<void>}
      */
     async updateLocale(locale) {
-        const config = vscode.workspace.getConfiguration('elementaryWatson');
+        const config = vscode.workspace.getConfiguration('poirot');
         await config.update('defaultLocale', locale, vscode.ConfigurationTarget.Workspace);
     }
 }

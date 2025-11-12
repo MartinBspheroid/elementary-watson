@@ -1,6 +1,6 @@
 {
-  "name": "elementarywatson",
-  "displayName": "ElementaryWatson",
+  "name": "poirot",
+  "displayName": "Poirot",
   "icon": "icon.png",
   "publisher": "romerramos",
   "keywords": [
@@ -15,11 +15,11 @@
     "inlang",
     "elementary",
     "watson",
-    "elementarywatson"
+    "poirot"
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/romerramos/elementary-watson.git"
+    "url": "https://github.com/romerramos/poirot.git"
   },
   "author": {
     "name": "Romer"
@@ -42,28 +42,28 @@
   "main": "./extension.js",
   "contributes": {
     "configuration": {
-      "title": "ElementaryWatson",
+      "title": "Poirot",
       "properties": {
-        "elementaryWatson.defaultLocale": {
+        "poirot.defaultLocale": {
           "type": "string",
           "default": "en",
           "description": "Default locale for displaying translation labels. If not set, will use the baseLocale from project.inlang settings or fallback to 'en'.",
           "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
           "patternErrorMessage": "Locale must be in format 'en' or 'en-US'"
         },
-        "elementaryWatson.realtimeUpdates": {
+        "poirot.realtimeUpdates": {
           "type": "boolean",
           "default": true,
           "description": "Enable real-time updates of translation labels while typing. When disabled, labels only update on save."
         },
-        "elementaryWatson.updateDelay": {
+        "poirot.updateDelay": {
           "type": "number",
           "default": 300,
           "minimum": 100,
           "maximum": 2000,
           "description": "Delay in milliseconds before updating translation labels after typing stops (100-2000ms)."
         },
-        "elementaryWatson.activeProject": {
+        "poirot.activeProject": {
           "type": ["string", "null"],
           "default": null,
           "description": "The active project path relative to workspace root. Automatically set when selecting a project."
@@ -71,14 +71,14 @@
       }
     },
     "views": {
-      "elementaryWatson": [
+      "poirot": [
         {
-          "id": "elementaryWatsonProjectSelector",
+          "id": "poirotProjectSelector",
           "name": "Project Selection",
           "when": "elementaryWatson.showProjectSelector"
         },
         {
-          "id": "elementaryWatsonTranslationKeys",
+          "id": "poirotTranslationKeys",
           "name": "Translation Keys",
           "when": "elementaryWatson.showSidebar"
         }
@@ -87,32 +87,32 @@
     "viewsContainers": {
       "activitybar": [
         {
-          "id": "elementaryWatson",
-          "title": "ElementaryWatson",
+          "id": "poirot",
+          "title": "Poirot",
           "icon": "$(globe)"
         }
       ]
     },
     "commands": [
       {
-        "command": "elementaryWatson.changeLocale",
+        "command": "poirot.changeLocale",
         "title": "Change Label Locales",
-        "category": "ElementaryWatson"
+        "category": "Poirot"
       },
       {
-        "command": "elementaryWatson.extractText",
+        "command": "poirot.extractText",
         "title": "Extract Text to Locale",
-        "category": "ElementaryWatson"
+        "category": "Poirot"
       },
       {
-        "command": "elementaryWatson.openTranslationFile",
+        "command": "poirot.openTranslationFile",
         "title": "Open Translation File",
         "icon": "$(target)"
       },
       {
-        "command": "elementaryWatson.selectProject",
+        "command": "poirot.selectProject",
         "title": "Select Active Project",
-        "category": "ElementaryWatson",
+        "category": "Poirot",
         "icon": "$(folder-active)"
       }
     ]
