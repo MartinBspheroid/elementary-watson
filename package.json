@@ -73,7 +73,12 @@
     "views": {
       "elementaryWatson": [
         {
-          "id": "elementaryWatsonSidebar",
+          "id": "elementaryWatsonProjectSelector",
+          "name": "Project Selection",
+          "when": "elementaryWatson.showProjectSelector"
+        },
+        {
+          "id": "elementaryWatsonTranslationKeys",
           "name": "Translation Keys",
           "when": "elementaryWatson.showSidebar"
         }

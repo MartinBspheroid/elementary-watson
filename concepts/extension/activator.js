@@ -4,7 +4,8 @@ const { EditorService } = require('../editor/service');
 const { LocaleService } = require('../locale/service');
 const { ExtractionService } = require('../extraction/service');
 const { SidebarService } = require('../sidebar/service');
-const { SidebarTreeProvider } = require('../sidebar/provider');
+const { ProjectSelectorProvider } = require('../sidebar/project-provider');
+const { TranslationKeysProvider } = require('../sidebar/translation-keys-provider');
 const { ProjectService } = require('../project/service');
 
 /**
@@ -17,14 +18,16 @@ class ExtensionActivator {
         this.extractionService = new ExtractionService();
         this.sidebarService = new SidebarService();
         this.projectService = new ProjectService();
-        this.sidebarTreeProvider = new SidebarTreeProvider(this.sidebarService);
+        this.projectSelectorProvider = new ProjectSelectorProvider();
+        this.translationKeysProvider = new TranslationKeysProvider(this.sidebarService);
         this.disposables = [];
-        this.treeView = null; // Tree view instance for title updates
-        
+        this.projectSelectorView = null; // Project selector view instance
+        this.translationKeysView = null; // Translation keys view instance
+
         // Debounce utilities for content change updates
         this.documentUpdateTimeouts = new Map(); // Map of document URI to timeout
         this.DEBOUNCE_DELAY = 300; // ms to wait after typing stops (will be updated from config)
-        
+
         // File watchers for translation files
         this.translationFileWatchers = [];
     }
@@ -107,11 +110,11 @@ class ExtensionActivator {
     activate(context) {
         console.log('ElementaryWatson i18n companion is now active!');
 
-        // Register the sidebar tree provider
+        // Register the sidebar views
         this.registerSidebar();
-        
-        // Connect tree view to provider for title updates
-        this.sidebarTreeProvider.setTreeView(this.treeView);
+
+        // Initialize project selector view
+        this.projectSelectorProvider.refresh();
 
         // Register the change locale command
         this.registerChangeLocaleCommand();
@@ -151,19 +154,29 @@ class ExtensionActivator {
     }
 
     /**
-     * Register the sidebar tree provider
+     * Register both sidebar views
      */
     registerSidebar() {
-        // Create tree view with proper title support
-        this.treeView = vscode.window.createTreeView('elementaryWatsonSidebar', {
-            treeDataProvider: this.sidebarTreeProvider,
+        // Register project selector view
+        this.projectSelectorView = vscode.window.createTreeView('elementaryWatsonProjectSelector', {
+            treeDataProvider: this.projectSelectorProvider,
             showCollapseAll: false
         });
-        
+
+        // Register translation keys view
+        this.translationKeysView = vscode.window.createTreeView('elementaryWatsonTranslationKeys', {
+            treeDataProvider: this.translationKeysProvider,
+            showCollapseAll: false
+        });
+
         // Add to disposables for cleanup
-        this.disposables.push(this.treeView);
-        
-        // Set context to show sidebar
+        this.disposables.push(this.projectSelectorView, this.translationKeysView);
+
+        // Connect translation keys view to provider for title updates
+        this.translationKeysProvider.setTreeView(this.translationKeysView);
+
+        // Set contexts to control visibility
+        vscode.commands.executeCommand('setContext', 'elementaryWatson.showProjectSelector', true);
         vscode.commands.executeCommand('setContext', 'elementaryWatson.showSidebar', true);
     }
 
@@ -256,18 +269,21 @@ class ExtensionActivator {
                     // Save the active project setting
                     await this.projectService.setActiveProject(workspacePath, selectedPath);
 
+                    // Refresh project selector view
+                    await this.projectSelectorProvider.refresh();
+
                     // Refresh everything with the new project context
                     await this.processActiveEditor();
-                    
-                    // Refresh sidebar
+
+                    // Refresh translation keys view
                     const activeEditor = vscode.window.activeTextEditor;
                     if (activeEditor) {
-                        await this.sidebarTreeProvider.refresh(activeEditor.document);
+                        await this.translationKeysProvider.refresh(activeEditor.document);
                     }
-                    
+
                     // Update translation file watchers for the new project
                     await this.setupTranslationFileWatchers();
-                    
+
                     vscode.window.showInformationMessage(`Active project changed to: ${this.projectService.getProjectName(selectedPath)}`);
                 }
             } catch (error) {
@@ -302,7 +318,7 @@ class ExtensionActivator {
                     // Refresh sidebar with current document to ensure it shows the clicked key
                     const activeEditor = vscode.window.activeTextEditor;
                     if (activeEditor && activeEditor.document.uri.fsPath === filePath) {
-                        await this.sidebarTreeProvider.refresh(activeEditor.document, true);
+                        await this.translationKeysProvider.refresh(activeEditor.document, true);
                     }
 
                     // Open the translation file for the current locale and navigate to the key
@@ -410,12 +426,12 @@ class ExtensionActivator {
             if (!workspacePath) return;
 
             // Check if sidebar has preserved context (from a previous non-translation file)
-            const hasPreservedContext = this.sidebarTreeProvider.currentFilePath &&
-                                       this.sidebarTreeProvider.translationData.length > 0;
+            const hasPreservedContext = this.translationKeysProvider.currentFilePath &&
+                                       this.translationKeysProvider.translationData.length > 0;
 
             if (hasPreservedContext) {
                 // Refresh the preserved context with updated translation values
-                const preservedFilePath = this.sidebarTreeProvider.currentFilePath;
+                const preservedFilePath = this.translationKeysProvider.currentFilePath;
                 try {
                     const preservedDocument = await vscode.workspace.openTextDocument(preservedFilePath);
 
@@ -425,19 +441,19 @@ class ExtensionActivator {
                     }
 
                     // Force refresh sidebar with the preserved context to get updated translation values
-                    await this.sidebarTreeProvider.refresh(preservedDocument, true);
+                    await this.translationKeysProvider.refresh(preservedDocument, true);
 
                     console.log(`📋 Updated preserved context for: ${path.basename(preservedFilePath)}`);
                 } catch (error) {
                     console.error('Error refreshing preserved context:', error);
                     // Fallback: just refresh the data structure
-                    this.sidebarTreeProvider._onDidChangeTreeData.fire();
+                    this.translationKeysProvider._onDidChangeTreeData.fire();
                 }
             } else {
                 // No preserved context, refresh current editor if it's supported
                 if (activeEditor && this.editorService.isSupportedDocument(activeEditor.document)) {
                     await this.editorService.processDocument(activeEditor.document);
-                    await this.sidebarTreeProvider.refresh(activeEditor.document);
+                    await this.translationKeysProvider.refresh(activeEditor.document);
                 }
             }
 
@@ -475,7 +491,7 @@ class ExtensionActivator {
                 await this.editorService.processDocument(document);
                 
                 // Refresh sidebar for the saved document
-                await this.sidebarTreeProvider.refresh(document);
+                await this.translationKeysProvider.refresh(document);
             }
         });
 
@@ -485,14 +501,14 @@ class ExtensionActivator {
                 await this.editorService.processDocument(editor.document);
                 
                 // Refresh sidebar for the new active document (don't force if it's a translation file)
-                await this.sidebarTreeProvider.refresh(editor.document);
+                await this.translationKeysProvider.refresh(editor.document);
             } else if (editor && await this.sidebarService.isTranslationFile(editor.document)) {
                 // Don't clear sidebar when switching to translation files - preserve context
                 // Call refresh to update UI with preserved data, but don't force update
-                await this.sidebarTreeProvider.refresh(editor.document);
+                await this.translationKeysProvider.refresh(editor.document);
             } else {
                 // Clear sidebar if no supported document is active and it's not a translation file
-                await this.sidebarTreeProvider.refresh(null);
+                await this.translationKeysProvider.refresh(null);
             }
         });
 
@@ -527,7 +543,7 @@ class ExtensionActivator {
                     await this.editorService.processDocument(document);
                     
                     // Refresh sidebar for the changed document
-                    await this.sidebarTreeProvider.refresh(document);
+                    await this.translationKeysProvider.refresh(document);
                 } catch (error) {
                     console.error('Error processing document content change:', error);
                 }
@@ -543,7 +559,7 @@ class ExtensionActivator {
                 // Refresh sidebar when locale changes
                 const activeEditor = vscode.window.activeTextEditor;
                 if (activeEditor && this.editorService.isSupportedDocument(activeEditor.document)) {
-                    await this.sidebarTreeProvider.refresh(activeEditor.document);
+                    await this.translationKeysProvider.refresh(activeEditor.document);
                 }
             }
             
@@ -586,11 +602,11 @@ class ExtensionActivator {
                 await this.editorService.processDocument(document);
                 
                 // Refresh sidebar for the active document
-                await this.sidebarTreeProvider.refresh(document);
+                await this.translationKeysProvider.refresh(document);
             }
         } else {
             // Clear sidebar if no active editor
-            await this.sidebarTreeProvider.refresh(null);
+            await this.translationKeysProvider.refresh(null);
         }
     }
 
