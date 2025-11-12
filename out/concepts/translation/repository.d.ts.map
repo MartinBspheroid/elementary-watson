@@ -1,0 +1,1 @@
+{"version":3,"file":"repository.d.ts","sourceRoot":"","sources":["../../../src/concepts/translation/repository.ts"],"names":[],"mappings":"AAGA;;GAEG;AACH,qBAAa,qBAAqB;IACjC;;;;;OAKG;IACG,gBAAgB,CAAC,mBAAmB,EAAE,MAAM,EAAE,MAAM,EAAE,MAAM,GAAG,OAAO,CAAC,MAAM,CAAC,MAAM,EAAE,OAAO,CAAC,GAAG,IAAI,CAAC;IAsB5G;;;;OAIG;IACH,qBAAqB,CAAC,mBAAmB,EAAE,MAAM,GAAG,OAAO;CAG3D"}
